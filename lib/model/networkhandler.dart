@@ -59,7 +59,7 @@ class NetworkHandler {
   Future<dynamic> EditTask(Map<dynamic, dynamic> body) async {
     var token = await MySharedPreferences.instance.getStringValue("token");
     var url =
-    Uri.parse('https://rocky-brushlands-19286.herokuapp.com/todo/store');
+    Uri.parse('https://rocky-brushlands-19286.herokuapp.com/todo/update');
     var response = await http.post(url,
         headers: {
           "Authorization": "Bearer $token",

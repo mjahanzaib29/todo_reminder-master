@@ -123,6 +123,7 @@ class _TaskPageState extends State<TaskPage> {
                 textColor: Colors.white,
                 child: Text('ADD'),
                 onPressed: () {
+                  pickDateTime();
                   setState(() {
                     codeDialog = valueText;
                     Navigator.pop(context);
@@ -133,5 +134,54 @@ class _TaskPageState extends State<TaskPage> {
             ],
           );
         });
+  }
+
+
+
+  //////////
+  Future pickDateTime(BuildContext context) async {
+    final date = await pickDate(context);
+    if (date == null) return;
+
+    final time = await pickTime(context);
+    if (time == null) return;
+
+    setState(() {
+      dateTime = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        time.hour,
+        time.minute,
+      );
+    });
+  }
+
+  Future<DateTime> pickDate(BuildContext context) async {
+    final initialDateNow = DateTime.now();
+    final newDate = await showDatePicker(
+      context: context,
+      initialDate: initialDateNow,
+      firstDate: initialDateNow.subtract(Duration(days: 0)),
+      lastDate: DateTime(DateTime.now().year + 5),
+    );
+
+    if (newDate == null) return null;
+
+    return newDate;
+  }
+
+  Future<TimeOfDay> pickTime(BuildContext context) async {
+    final initialTime = TimeOfDay(hour: 9, minute: 0);
+    final newTime = await showTimePicker(
+      context: context,
+      initialTime: dateTime != null
+          ? TimeOfDay(hour: dateTime.hour, minute: dateTime.minute)
+          : initialTime,
+    );
+
+    if (newTime == null) return null;
+
+    return newTime;
   }
 }
