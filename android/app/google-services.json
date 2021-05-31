@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "63001478658",
+    "project_id": "todo-app224",
+    "storage_bucket": "todo-app224.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:63001478658:android:d170d1210fd62ba2e8091b",
+        "android_client_info": {
+          "package_name": "com.example.todo_reminder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "63001478658-ste9mdgnis44jeofhaej85j2o9p9s9l1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJEVkzdGtSKzy29V1NrdBCwhTF60nqe5s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "63001478658-ste9mdgnis44jeofhaej85j2o9p9s9l1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "63001478658-cleub1inj1t877r16mm16va1eqikg0dm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.todo.todoReminder"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
