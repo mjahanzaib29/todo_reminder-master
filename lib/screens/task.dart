@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_reminder/constant/pallete.dart';
 import 'package:todo_reminder/constant/string_constant.dart';
+import 'package:todo_reminder/model/categoryinfo.dart';
 import 'package:todo_reminder/model/networkhandler.dart';
 import 'package:todo_reminder/model/todoinfo.dart';
 
@@ -12,14 +14,31 @@ class TaskPage extends StatefulWidget {
 }
 
 class _TaskPageState extends State<TaskPage> {
-  String EDnote;
-  final TextEditingController _addcategoryname = TextEditingController();
+  DateTime dateTime;
+  DateTime now1;
+  var todoreminderIndex, SelectedWork;
+  String EDnote, currentschedule, ReminderTime,EDTime;
+
+  DateTime now = DateTime.now();
+  String  CurrentTimeForReminder, CategoryId;
+  var selectedCat;
+  final TextEditingController _currentdatetime = TextEditingController();
+  final TextEditingController _selecteddate = TextEditingController();
+  final TextEditingController _EditNote = TextEditingController();
+  Future<TodoInfo> alltasks;
+  Future<Welcome> _category;
+
+  var tokenupdate;
+
+  var Datetime;
+
   NetworkHandler networkHandler = NetworkHandler();
   Future<TodoInfo> _alltasks;
 
   @override
   Widget build(BuildContext context) {
     setState(() {
+      _category = networkHandler.getcategoryfordropdown();
       _alltasks = networkHandler.getTodolist();
     });
     return Scaffold(
@@ -54,28 +73,23 @@ class _TaskPageState extends State<TaskPage> {
                   return ListView.builder(
                     itemCount: snapshot.data.todos.length,
                     itemBuilder: (context, index) {
-                      var todoreminder = snapshot.data.todos[index];
-                      return Container(
-                        decoration: BoxDecoration(
-                            border: Border(
-                                bottom:
-                                BorderSide(color: Colors.grey[300]))),
-                        child: Dismissible(
-                          background: Container(
-                            color: Colors.red,
-                          ),
-                          key: ValueKey(index),
-                          onDismissed: (direction) {
-                            setState(() {
-                              snapshot.data.todos.removeAt(index);
-                            });
-                          },
+                      todoreminderIndex = snapshot.data.todos[index];
+                      return GestureDetector(
+                        onTap: () {
+                          _editTodo(context, snapshot.data.todos[index].work,
+                              snapshot.data.todos[index].reminderTime,
+                              snapshot.data.todos[index].category);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(color: Colors.grey[300]))),
                           child: ListTile(
-                            onTap: () => _editTodo(context),
-                            title: Text(todoreminder.work),
-                            leading: Text("ID: " + todoreminder.id.toString()),
-                            subtitle: Text(
-                                "ReminderTime : " + todoreminder.reminderTime.toString()),
+                            title: Text(todoreminderIndex.work),
+                            leading:
+                                Text("ID: " + todoreminderIndex.id.toString()),
+                            subtitle: Text("ReminderTime : " +
+                                todoreminderIndex.reminderTime.toString()),
                           ),
                         ),
                       );
@@ -92,20 +106,75 @@ class _TaskPageState extends State<TaskPage> {
     );
   }
 
-  Future<void> _editTodo (BuildContext context) async {
+  Future<void> _editTodo(var ctx, var work, var reminder,var cat) async {
     return showDialog(
-        context: context,
-        builder: (context) {
+        context: ctx,
+        builder: (ctx) {
           return AlertDialog(
-            title: Text(' '),
-            content: TextField(
-              onChanged: (value) {
-                setState(() {
-                  EDnote = value;
-                });
-              },
-              controller: _addcategoryname,
-              decoration: InputDecoration(hintText: "Name"),
+            title: Text("Edit"),
+            content: Column(
+              children: [
+                TextField(
+                  // onChanged: (value) {
+                  //   setState(() {
+                  //     EDnote = value;
+                  //   });
+                  // },
+                  controller: _EditNote..text = work,
+                  decoration: InputDecoration(
+                    labelText: "Name",
+                  ),
+                ),
+                //For time and date
+                TextField(
+                  enabled: false,
+                  controller: _selecteddate,
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.calendar_today),
+                    labelStyle: Pallete.khint,
+                    labelText: getDateTime(),
+                  ),
+                ),
+                //Pick time and date
+                FlatButton(
+                  color: Colors.red,
+                  textColor: Colors.white,
+                  child: Text('PickDateTime'),
+                 onPressed: () => pickDateTime(context),
+                ),
+                Text("Select Cat"),
+              FutureBuilder<Welcome>(
+              future: _category,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  var catstring = snapshot.data.todos;
+                  var catid =
+                  snapshot.data.todos.map((e) => e.id);
+                  return DropdownButton<String>(
+                    items: catstring.map((value) {
+                      return new DropdownMenuItem(
+                        value: value.id.toString(),
+                        // child: new Text(value.name),
+                        child: new Text(value.name),
+                      );
+                    }).toList(),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        CategoryId = newValue;
+                        if (CategoryId != null) {
+                          selectedCat = (CategoryId);
+                        }
+                      });
+                    },
+                    isExpanded: true,
+                    value: selectedCat,
+                  );
+                } else {
+                  return Center(
+                      child: CircularProgressIndicator());
+                }
+              }),
+              ],
             ),
             actions: <Widget>[
               FlatButton(
@@ -123,12 +192,10 @@ class _TaskPageState extends State<TaskPage> {
                 textColor: Colors.white,
                 child: Text('ADD'),
                 onPressed: () {
-                  pickDateTime();
-                  setState(() {
-                    codeDialog = valueText;
-                    Navigator.pop(context);
-                  });
-                  Catadd();
+                  print(_EditNote.text);
+                  // codeDialog = valueText;
+                  Navigator.pop(context);
+                  // Catadd();
                 },
               ),
             ],
@@ -136,15 +203,33 @@ class _TaskPageState extends State<TaskPage> {
         });
   }
 
+  String getDateTime() {
+    print("getDateTime working" + dateTime.toString());
+    if (dateTime == null) {
+      return 'Schedule ';
+    } else {
+      setState(() {
+        now1 = DateTime.now();
+        currentschedule = DateFormat('yyyy-MM-dd').format(now1);
+        _currentdatetime.text = currentschedule;
+        ReminderTime = DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+      });
 
+      CurrentTimeForReminder = DateFormat('yyyy-MM-dd HH:mm').format(dateTime).toString();
 
-  //////////
+      print("reminder Time ====>" + ReminderTime);
+      // return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+      return CurrentTimeForReminder;
+    }
+  }
+
   Future pickDateTime(BuildContext context) async {
     final date = await pickDate(context);
     if (date == null) return;
 
     final time = await pickTime(context);
     if (time == null) return;
+
 
     setState(() {
       dateTime = DateTime(
@@ -155,6 +240,7 @@ class _TaskPageState extends State<TaskPage> {
         time.minute,
       );
     });
+    print("pick date time ===>"+ dateTime.toString());
   }
 
   Future<DateTime> pickDate(BuildContext context) async {

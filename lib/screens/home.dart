@@ -25,8 +25,8 @@ class _HomeState extends State<Home> {
   final TextEditingController _currentdatetime = TextEditingController();
   final TextEditingController _note = TextEditingController();
   final TextEditingController _selecteddate = TextEditingController();
-  final TextEditingController _selectedtime = TextEditingController();
-  final TextEditingController _category = TextEditingController();
+  // final TextEditingController _selectedtime = TextEditingController();
+  // final TextEditingController _category = TextEditingController();
   Future<TodoInfo> alltasks;
   var tokenupdate;
 
