@@ -76,7 +76,7 @@ class _TaskPageState extends State<TaskPage> {
                       todoreminderIndex = snapshot.data.todos[index];
                       return GestureDetector(
                         onTap: () {
-                          _editTodo(
+                           _editTodo(
                               context,
                               snapshot.data.todos[index].work,
                               snapshot.data.todos[index].reminderTime,
@@ -218,9 +218,7 @@ class _TaskPageState extends State<TaskPage> {
         ReminderTime = DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
         return ReminderTime;
       });
-
-      // print(ReminderTime);
-      // return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+      return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
     }
   }
 

@@ -334,8 +334,10 @@ class _HomeState extends State<Home> {
 
   String getDateTime() {
     if (dateTime == null) {
+      print("DTTTTTT..............fail");
       return 'Schedule ';
     } else {
+      print("DTTTTTTTT..........pass");
       setState(() {
         now1 = DateTime.now();
         currentschedule = DateFormat('yyyy-MM-dd').format(now1);
