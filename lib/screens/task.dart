@@ -17,10 +17,10 @@ class _TaskPageState extends State<TaskPage> {
   DateTime dateTime;
   DateTime now1;
   var todoreminderIndex, SelectedWork;
-  String EDnote, currentschedule, ReminderTime,EDTime;
+  String EDnote, currentschedule, ReminderTime, EDTime;
 
   DateTime now = DateTime.now();
-  String  CurrentTimeForReminder, CategoryId;
+  String CurrentTimeForReminder, CategoryId;
   var selectedCat;
   final TextEditingController _currentdatetime = TextEditingController();
   final TextEditingController _selecteddate = TextEditingController();
@@ -76,7 +76,9 @@ class _TaskPageState extends State<TaskPage> {
                       todoreminderIndex = snapshot.data.todos[index];
                       return GestureDetector(
                         onTap: () {
-                          _editTodo(context, snapshot.data.todos[index].work,
+                          _editTodo(
+                              context,
+                              snapshot.data.todos[index].work,
                               snapshot.data.todos[index].reminderTime,
                               snapshot.data.todos[index].category);
                         },
@@ -106,7 +108,7 @@ class _TaskPageState extends State<TaskPage> {
     );
   }
 
-  Future<void> _editTodo(var ctx, var work, var reminder,var cat) async {
+  Future<void> _editTodo(var ctx, var work, var reminder, var cat) async {
     return showDialog(
         context: ctx,
         builder: (ctx) {
@@ -140,40 +142,38 @@ class _TaskPageState extends State<TaskPage> {
                   color: Colors.red,
                   textColor: Colors.white,
                   child: Text('PickDateTime'),
-                 onPressed: () => pickDateTime(context),
+                  onPressed: () => pickDateTime(context),
                 ),
                 Text("Select Cat"),
-              FutureBuilder<Welcome>(
-              future: _category,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  var catstring = snapshot.data.todos;
-                  var catid =
-                  snapshot.data.todos.map((e) => e.id);
-                  return DropdownButton<String>(
-                    items: catstring.map((value) {
-                      return new DropdownMenuItem(
-                        value: value.id.toString(),
-                        // child: new Text(value.name),
-                        child: new Text(value.name),
-                      );
-                    }).toList(),
-                    onChanged: (String newValue) {
-                      setState(() {
-                        CategoryId = newValue;
-                        if (CategoryId != null) {
-                          selectedCat = (CategoryId);
-                        }
-                      });
-                    },
-                    isExpanded: true,
-                    value: selectedCat,
-                  );
-                } else {
-                  return Center(
-                      child: CircularProgressIndicator());
-                }
-              }),
+                FutureBuilder<Welcome>(
+                    future: _category,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        var catstring = snapshot.data.todos;
+                        var catid = snapshot.data.todos.map((e) => e.id);
+                        return DropdownButton<String>(
+                          items: catstring.map((value) {
+                            return new DropdownMenuItem(
+                              value: value.id.toString(),
+                              // child: new Text(value.name),
+                              child: new Text(value.name),
+                            );
+                          }).toList(),
+                          onChanged: (String newValue) {
+                            setState(() {
+                              CategoryId = newValue;
+                              if (CategoryId != null) {
+                                selectedCat = (CategoryId);
+                              }
+                            });
+                          },
+                          isExpanded: true,
+                          value: selectedCat,
+                        );
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                    }),
               ],
             ),
             actions: <Widget>[
@@ -204,22 +204,23 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   String getDateTime() {
-    print("getDateTime working" + dateTime.toString());
+    print("GEt DATE TIME ");
     if (dateTime == null) {
+      print("DT FAILED...........................");
       return 'Schedule ';
     } else {
+      print("DT pass.....................");
       setState(() {
         now1 = DateTime.now();
         currentschedule = DateFormat('yyyy-MM-dd').format(now1);
         _currentdatetime.text = currentschedule;
+        // CurrentTimeForReminder = DateFormat('yyyy-MM-dd').format(dateTime);
         ReminderTime = DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+        return ReminderTime;
       });
 
-      CurrentTimeForReminder = DateFormat('yyyy-MM-dd HH:mm').format(dateTime).toString();
-
-      print("reminder Time ====>" + ReminderTime);
+      // print(ReminderTime);
       // return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
-      return CurrentTimeForReminder;
     }
   }
 
@@ -230,7 +231,6 @@ class _TaskPageState extends State<TaskPage> {
     final time = await pickTime(context);
     if (time == null) return;
 
-
     setState(() {
       dateTime = DateTime(
         date.year,
@@ -240,7 +240,6 @@ class _TaskPageState extends State<TaskPage> {
         time.minute,
       );
     });
-    print("pick date time ===>"+ dateTime.toString());
   }
 
   Future<DateTime> pickDate(BuildContext context) async {
