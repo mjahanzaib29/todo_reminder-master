@@ -148,13 +148,16 @@ class _TaskPageState extends State<TaskPage> {
                           onChanged: (String newValue) {
                             setState(() {
                               categoryId = newValue;
-                              if (categoryId != null) {
-                                selectedCat = categoryId;
-                              }
+                                selectedCat = newValue;
                             });
                           },
+                          selectedItemBuilder: (context) {
+                             return catIndex.map<Widget>((item){
+                               return Text(item.name);
+                            }).toList();
+                          },
                           isExpanded: true,
-                          value: categoryId,
+                          value: selectedCat,
                         );
                       } else {
                         return Center(child: CircularProgressIndicator());
