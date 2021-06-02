@@ -66,8 +66,8 @@ class _TaskPageState extends State<TaskPage> {
                     itemBuilder: (context, index) {
                       var todoIndex = snapshot.data.todos[index];
                       return GestureDetector(
-                        onTap: () {
-                          _editTodo(
+                        onTap: () async {
+                          await _editTodo(
                               context,
                               snapshot.data.todos[index].work,
                               snapshot.data.todos[index].reminderTime,
@@ -99,7 +99,7 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   Future<void> _editTodo(var ctx, var work, var reminder, var cat) async {
-    return showDialog(
+    return await showDialog(
         context: ctx,
         builder: (ctx) {
           return AlertDialog(
@@ -149,12 +149,12 @@ class _TaskPageState extends State<TaskPage> {
                             setState(() {
                               categoryId = newValue;
                               if (categoryId != null) {
-                                selectedCat = (categoryId);
+                                selectedCat = categoryId;
                               }
                             });
                           },
                           isExpanded: true,
-                          value: selectedCat,
+                          value: categoryId,
                         );
                       } else {
                         return Center(child: CircularProgressIndicator());
