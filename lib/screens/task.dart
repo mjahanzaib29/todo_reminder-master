@@ -14,26 +14,17 @@ class TaskPage extends StatefulWidget {
 }
 
 class _TaskPageState extends State<TaskPage> {
-  DateTime dateTime;
-  DateTime now1;
-  var todoreminderIndex, SelectedWork;
-  String EDnote, currentschedule, ReminderTime, EDTime;
-
-  DateTime now = DateTime.now();
-  String CurrentTimeForReminder, CategoryId;
-  var selectedCat;
-  final TextEditingController _currentdatetime = TextEditingController();
-  final TextEditingController _selecteddate = TextEditingController();
-  final TextEditingController _EditNote = TextEditingController();
   Future<TodoInfo> alltasks;
-  Future<Welcome> _category;
-
-  var tokenupdate;
-
-  var Datetime;
+  DateTime dateTime, now;
+  String currentDate, newTimeReminder, categoryId;
+  final TextEditingController _currentDateController = TextEditingController();
+  final TextEditingController _editNoteController = TextEditingController();
+  final TextEditingController _editScheduleController = TextEditingController();
 
   NetworkHandler networkHandler = NetworkHandler();
   Future<TodoInfo> _alltasks;
+  Future<Welcome> _category;
+  var selectedCat;
 
   @override
   Widget build(BuildContext context) {
@@ -73,10 +64,10 @@ class _TaskPageState extends State<TaskPage> {
                   return ListView.builder(
                     itemCount: snapshot.data.todos.length,
                     itemBuilder: (context, index) {
-                      todoreminderIndex = snapshot.data.todos[index];
+                      var todoIndex = snapshot.data.todos[index];
                       return GestureDetector(
                         onTap: () {
-                           _editTodo(
+                          _editTodo(
                               context,
                               snapshot.data.todos[index].work,
                               snapshot.data.todos[index].reminderTime,
@@ -87,11 +78,10 @@ class _TaskPageState extends State<TaskPage> {
                               border: Border(
                                   bottom: BorderSide(color: Colors.grey[300]))),
                           child: ListTile(
-                            title: Text(todoreminderIndex.work),
-                            leading:
-                                Text("ID: " + todoreminderIndex.id.toString()),
+                            title: Text(todoIndex.work),
+                            leading: Text("ID: " + todoIndex.id.toString()),
                             subtitle: Text("ReminderTime : " +
-                                todoreminderIndex.reminderTime.toString()),
+                                todoIndex.reminderTime.toString()),
                           ),
                         ),
                       );
@@ -117,53 +107,49 @@ class _TaskPageState extends State<TaskPage> {
             content: Column(
               children: [
                 TextField(
-                  // onChanged: (value) {
-                  //   setState(() {
-                  //     EDnote = value;
-                  //   });
-                  // },
-                  controller: _EditNote..text = work,
+                  controller: _editNoteController..text = work,
                   decoration: InputDecoration(
                     labelText: "Name",
                   ),
                 ),
                 //For time and date
                 TextField(
+                  controller: _editScheduleController,
                   enabled: false,
-                  controller: _selecteddate,
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.calendar_today),
                     labelStyle: Pallete.khint,
-                    labelText: getDateTime(),
+                    labelText: changeDateTime(),
                   ),
                 ),
                 //Pick time and date
                 FlatButton(
                   color: Colors.red,
                   textColor: Colors.white,
-                  child: Text('PickDateTime'),
-                  onPressed: () => pickDateTime(context),
+                  child: Text('Reschedule'),
+                  onPressed: () {
+                    pickDateTime(ctx);
+                  },
                 ),
-                Text("Select Cat"),
+                Text("Category"),
                 FutureBuilder<Welcome>(
                     future: _category,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        var catstring = snapshot.data.todos;
+                        var catIndex = snapshot.data.todos;
                         var catid = snapshot.data.todos.map((e) => e.id);
                         return DropdownButton<String>(
-                          items: catstring.map((value) {
+                          items: catIndex.map((value) {
                             return new DropdownMenuItem(
                               value: value.id.toString(),
-                              // child: new Text(value.name),
                               child: new Text(value.name),
                             );
                           }).toList(),
                           onChanged: (String newValue) {
                             setState(() {
-                              CategoryId = newValue;
-                              if (CategoryId != null) {
-                                selectedCat = (CategoryId);
+                              categoryId = newValue;
+                              if (categoryId != null) {
+                                selectedCat = (categoryId);
                               }
                             });
                           },
@@ -192,10 +178,7 @@ class _TaskPageState extends State<TaskPage> {
                 textColor: Colors.white,
                 child: Text('ADD'),
                 onPressed: () {
-                  print(_EditNote.text);
-                  // codeDialog = valueText;
                   Navigator.pop(context);
-                  // Catadd();
                 },
               ),
             ],
@@ -203,7 +186,7 @@ class _TaskPageState extends State<TaskPage> {
         });
   }
 
-  String getDateTime() {
+  String changeDateTime() {
     print("GEt DATE TIME ");
     if (dateTime == null) {
       print("DT FAILED...........................");
@@ -211,14 +194,16 @@ class _TaskPageState extends State<TaskPage> {
     } else {
       print("DT pass.....................");
       setState(() {
-        now1 = DateTime.now();
-        currentschedule = DateFormat('yyyy-MM-dd').format(now1);
-        _currentdatetime.text = currentschedule;
-        // CurrentTimeForReminder = DateFormat('yyyy-MM-dd').format(dateTime);
-        ReminderTime = DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
-        return ReminderTime;
+        now = DateTime.now();
+        currentDate = DateFormat('yyyy-MM-dd').format(now);
+        _currentDateController.text = currentDate;
+        newTimeReminder = DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+        _editScheduleController.text = newTimeReminder;
+        print("This is new Time setstate" + newTimeReminder);
+        return newTimeReminder;
       });
-      return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+      print("This is new TIme" + newTimeReminder);
+      return newTimeReminder;
     }
   }
 
@@ -262,9 +247,7 @@ class _TaskPageState extends State<TaskPage> {
           ? TimeOfDay(hour: dateTime.hour, minute: dateTime.minute)
           : initialTime,
     );
-
     if (newTime == null) return null;
-
     return newTime;
   }
 }
